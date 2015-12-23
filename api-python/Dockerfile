@@ -1,5 +1,5 @@
 FROM ubuntu:trusty
-MAINTAINER pro@pichois.fr
+MAINTAINER robertondame@hotmail.fr
 
 RUN apt-get update \
     && apt-get install -y \

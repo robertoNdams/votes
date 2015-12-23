@@ -13,56 +13,54 @@ using Service.Models;
 
 namespace Service
 {
-    public partial class Startup
+  public partial class Startup
+  {
+    public static OAuthAuthorizationServerOptions OAuthOptions { get; private set; }
+    public static string PublicClientId { get; private set; }
+
+    public void ConfigureAuth(IAppBuilder app)
     {
-        public static OAuthAuthorizationServerOptions OAuthOptions { get; private set; }
+      // Configure context data base and User Manager to use a single instance per application
+      app.CreatePerOwinContext(ApplicationDbContext.Create);
+      app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
 
-        public static string PublicClientId { get; private set; }
+      // Enable the application to use a cookie to store the user information logged
+      // and use a cookie to temporarily store information about a user who connects with third connection provider
+      app.UseCookieAuthentication(new CookieAuthenticationOptions());
+      app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
-        // Pour plus d'informations sur la configuration de l'authentification, consultez http://go.microsoft.com/fwlink/?LinkId=301864
-        public void ConfigureAuth(IAppBuilder app)
-        {
-            // Configurer le contexte de base de données et le gestionnaire des utilisateurs pour utiliser une instance unique par demande
-            app.CreatePerOwinContext(ApplicationDbContext.Create);
-            app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
+      // Configure the application to the flow based on OAuth
+      PublicClientId = "self";
+      OAuthOptions = new OAuthAuthorizationServerOptions
+      {
+        TokenEndpointPath = new PathString("/Token"),
+        Provider = new ApplicationOAuthProvider(PublicClientId),
+        AuthorizeEndpointPath = new PathString("/api/Account/ExternalLogin"),
+        AccessTokenExpireTimeSpan = TimeSpan.FromDays(14),
+        AllowInsecureHttp = true
+      };
 
-            // Activer l'application pour utiliser un cookie afin de stocker les informations de l'utilisateur connecté
-            // et utiliser un cookie pour stocker temporairement des informations sur un utilisateur qui se connecte avec un fournisseur de connexion tiers
-            app.UseCookieAuthentication(new CookieAuthenticationOptions());
-            app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
+      // Enable application to use the carrier of tokens to authenticate users
+      app.UseOAuthBearerTokens(OAuthOptions);
 
-            // Configurer l'application pour le flux basé sur OAuth
-            PublicClientId = "self";
-            OAuthOptions = new OAuthAuthorizationServerOptions
-            {
-                TokenEndpointPath = new PathString("/Token"),
-                Provider = new ApplicationOAuthProvider(PublicClientId),
-                AuthorizeEndpointPath = new PathString("/api/Account/ExternalLogin"),
-                AccessTokenExpireTimeSpan = TimeSpan.FromDays(14),
-                AllowInsecureHttp = true
-            };
+      // Uncomment the following lines to enable connection with third connection providers
+      /*  app.UseMicrosoftAccountAuthentication(
+          clientId: "",
+          clientSecret: "");
 
-            // Activer l'application pour utiliser les jetons du porteur afin d'authentifier les utilisateurs
-            app.UseOAuthBearerTokens(OAuthOptions);
+      app.UseTwitterAuthentication(
+          consumerKey: "",
+          consumerSecret: "");
 
-            // Décommenter les lignes suivantes pour activer la connexion avec des fournisseurs de connexion tiers
-            //app.UseMicrosoftAccountAuthentication(
-            //    clientId: "",
-            //    clientSecret: "");
+      app.UseFacebookAuthentication(
+          appId: "",
+          appSecret: "");
 
-            //app.UseTwitterAuthentication(
-            //    consumerKey: "",
-            //    consumerSecret: "");
-
-            //app.UseFacebookAuthentication(
-            //    appId: "",
-            //    appSecret: "");
-
-            //app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
-            //{
-            //    ClientId = "",
-            //    ClientSecret = ""
-            //});
-        }
+      app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions()
+      {
+          ClientId = "",
+          ClientSecret = ""
+      });*/
     }
+  }
 }

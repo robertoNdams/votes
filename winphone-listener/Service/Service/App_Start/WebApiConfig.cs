@@ -12,12 +12,12 @@ namespace Service
     {
         public static void Register(HttpConfiguration config)
         {
-            // Configuration et services de l'API Web
-            // Configurer l'API Web pour utiliser uniquement l'authentification de jeton du porteur.
+            // Web API configuration and services
+            // Configure the Web API to use only the wearer token authentication.
             config.SuppressDefaultHostAuthentication();
             config.Filters.Add(new HostAuthenticationFilter(OAuthDefaults.AuthenticationType));
 
-            // Itinéraires de l'API Web
+            // Itineraries of the Web API
             config.MapHttpAttributeRoutes();
 
             config.Routes.MapHttpRoute(

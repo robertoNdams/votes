@@ -3,11 +3,14 @@ using System.Web.Mvc;
 
 namespace Service
 {
-    public class FilterConfig
+    /// <summary>
+    /// This class contain all global filters
+    /// </summary>
+  public class FilterConfig
+  {
+    public static void RegisterGlobalFilters(GlobalFilterCollection filters)
     {
-        public static void RegisterGlobalFilters(GlobalFilterCollection filters)
-        {
-            filters.Add(new HandleErrorAttribute());
-        }
+      filters.Add(new HandleErrorAttribute());
     }
+  }
 }
